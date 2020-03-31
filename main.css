@@ -1,0 +1,8 @@
+body {
+  --accent-color-main: #0aac9e;
+  --accent-color-secondary: #ccd7da;
+  --bg-color-main: #2d2d2d;
+  background-color: var(--bg-color-main);
+  color: var(--accent-color-main);
+  text-align: center;
+}
