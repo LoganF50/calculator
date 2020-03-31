@@ -2,7 +2,67 @@ body {
   --accent-color-main: #0aac9e;
   --accent-color-secondary: #ccd7da;
   --bg-color-main: #2d2d2d;
+  --bg-color-btn: #525252;
+  --bg-color-btn-lighter: #525252;
+  --bg-color-btn-hover: #6e6e6e;
   background-color: var(--bg-color-main);
   color: var(--accent-color-main);
   text-align: center;
 }
+
+.header {
+  font-size: 5.0rem;
+}
+
+.calc-container {
+  font-size: 3.0rem;
+  display: flex;
+  flex-direction: column;
+  max-width: 80%;
+  margin: auto;
+  border: 5px solid var(--accent-color-main);
+  color: var(--accent-color-secondary);
+}
+
+  .calc-results-display {
+    background-color: var(--bg-color-main);
+    padding: 30px;
+    border: 2px solid var(--accent-color-main);
+  }
+
+    .calc-results-display-input {
+      font-size: 2.0rem;
+      text-align: left;
+      min-height: 40px;
+    }
+
+    .calc-results-display-answer {
+      text-align: right;
+      font-weight: bold;
+    }
+  
+    .calc-buttons {
+
+    }
+
+      .calc-buttons-row {
+        display: flex;
+        justify-content: space-evenly;
+      }
+
+        .calc-buttons-row-btn {
+          flex-grow: 1;
+          background-color: var(--bg-color-btn-lighter);
+          width: 100%;
+          height: 100%;
+          padding: 5% 0;
+          border: 1px solid var(--accent-color-main);
+        }
+
+        .calc-buttons-row-btn.mod-numpad {
+          background-color: var(--bg-color-main);
+        }
+
+        .calc-buttons-row-btn:hover {
+          background-color: var(--bg-color-btn-hover);
+        }
