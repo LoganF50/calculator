@@ -1,16 +1,14 @@
-class Calculator {
-  constructor() {
-    //functions to calculate
-    this.methods = {
-      '+': (a,b) => a + b,
-      '-': (a,b) => a - b,
-      '*': (a,b) => a * b,
-      '/': (a,b) => (b===0) ? NaN : a / b,
-    };
+function Calculator() {
+  //functions to calculate
+  this.methods = {
+    '+': (a,b) => a + b,
+    '-': (a,b) => a - b,
+    '*': (a,b) => a * b,
+    '/': (a,b) => (b===0) ? NaN : a / b,
   }
 
   //calls specific function if exists and both values are numbers
-  calculate(op, number1, number2) {
+  this.calculate = function(op, number1, number2) {
     if(!this.methods[op] || isNaN(number1) || isNaN(number2)) {
       return NaN;
     } else {
@@ -25,9 +23,41 @@ function allClear() {
   answer.innerHTML = 0;
 }
 
-//insert number
-function insertNumber(e) {
-  input.innerHTML = input.innerHTML + e.target.innerHTML;
+//inserts text into input div
+function handleInsertion(e) {
+  const str = e.target.innerHTML;
+  switch(str) {
+    //blank OR ends in operator
+    case '(':
+      input.innerHTML += (/^$|[-+/*]$/.test(input.innerHTML)) ? str : '';
+      break;
+    //ends in digit AND more '(' than ')'
+    case ')':
+      input.innerHTML += (/\d$/.test(input.innerHTML) && ((input.innerHTML.match(/[(]/g)||[]).length > (input.innerHTML.match(/[)]/g)||[]).length)) ? str : '';
+      break;
+    //ends in number or ')'
+    case '-':
+    case '+':
+    case '*':
+    case '/':
+      input.innerHTML += (/[\d)]$/.test(input.innerHTML)) ? str : '';
+      break;
+    //blank AND answer is not 0
+    case '+/-':
+      input.innerHTML += (/^$/.test(input.innerHTML) && answer.innerHTML !== '0') ? str : '';
+      break;
+    //number w/o '.'
+    case '.':
+      input.innerHTML += (/[^.]?\d+$/.test(input.innerHTML)) ? str : '';
+      break;
+    //if number cannot end in ')' else ''
+    default:
+        if(isNaN(parseInt(str))) {
+          input.innerHTML += '';
+        } else {
+          input.innerHTML += (/\)$/.test(input.innerHTML)) ? '' : str;
+        }
+  }
 }
 
 //  DOM ELEMENTS
@@ -43,9 +73,16 @@ let rawInput = '';
 //  ------------------------
 document.querySelector('#btn-all-clear').addEventListener('click', allClear);
 for(let num = 0; num <=9; num++) {
-  document.querySelector(`#btn-${num}`).addEventListener('click', insertNumber);
+  document.querySelector(`#btn-${num}`).addEventListener('click', handleInsertion);
 }
-
+document.querySelector(`#btn-open-parenthesis`).addEventListener('click', handleInsertion);
+document.querySelector(`#btn-close-parenthesis`).addEventListener('click', handleInsertion);
+document.querySelector(`#btn-divide`).addEventListener('click', handleInsertion);
+document.querySelector(`#btn-multiply`).addEventListener('click', handleInsertion);
+document.querySelector(`#btn-subtract`).addEventListener('click', handleInsertion);
+document.querySelector(`#btn-add`).addEventListener('click', handleInsertion);
+document.querySelector(`#btn-switch-sign`).addEventListener('click', handleInsertion);
+document.querySelector(`#btn-decimal`).addEventListener('click', handleInsertion);
 /*
   #display-input
   #display-answer
@@ -65,10 +102,11 @@ function logTest(msg, expected, actual) {
   }
 }
 
-/*
-//TESTING STARTS HERE
 let calc = new Calculator();
 
+
+//TESTING STARTS HERE
+/*
 //test add
 logTest('add', 3, calc.calculate('+', 1, 2));
 logTest('add', NaN, calc.calculate('+', 'as', 2));
@@ -90,4 +128,20 @@ logTest('divide', 3, calc.calculate('/', 6, 2));
 logTest('divide', NaN, calc.calculate('/', 6, 0));
 logTest('divide', 4, calc.calculate('/', 6, 1.5));
 logTest('divide', NaN, calc.calculate('/', 6, 'nasn'));
+*/
+
+//test regexer
+/*
+//  +/- ->  '' AND answer !==0 (insert (-)answer into input)
+const sign_switch_reg = /^$/;
+logTest('regex op', false, sign_switch_reg.test('12*'));
+logTest('regex #', false, sign_switch_reg.test('12'));
+logTest('regex \'\'', true, sign_switch_reg.test(''));
+
+//  . ->  # w/o '.'
+const decimal_reg = /[^.]\d+$/;
+logTest('regex op', false, decimal_reg.test('*'));
+logTest('regex #', true, decimal_reg.test('12'));
+logTest('regex # decimal #', true, decimal_reg.test('12.12'));
+logTest('regex # decimal', false, decimal_reg.test('12.'));
 */
