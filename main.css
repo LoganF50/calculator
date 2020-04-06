@@ -7,6 +7,7 @@ body {
   color: var(--color-main-light);
   text-align: center;
   font-size: 62.5%;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .header {
@@ -47,7 +48,6 @@ body {
   .calculator-keys {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 0.70rem;
   }
 
     .calculator-keys-btn {
@@ -55,7 +55,7 @@ body {
       border-radius: 0.5rem;
       background-color: var(--color-main-dark);
       color: var(--color-main-light);
-      font-size: 4rem;
+      font-size: 3.5rem;
       margin: 1rem;
     }
 
@@ -84,18 +84,3 @@ body {
     .calculator-keys-btn.mod-operator {
       color: var(--color-accent-2);
     }
-
-/*
-.header
-.calculator
-  .calculator-display
-    .calculator-display-div.mod-past-result #display-past-result
-    .calculator-display-div.mod-user-input  #display-user-input
-  .calculator-keys
-    .calculator-keys-btn
-    .calculator-keys-btn.mod-all-clear
-    .calculator-keys-btn.mod-equal-sign
-    .calculator-keys-btn.mod-operator
-
-value: [+, -, *, /, 7, 8, 9, 4, 5, 6, 1, 2, 3, 0, ., AC, =]
-*/
