@@ -1,3 +1,107 @@
+class Calculator {
+  constructor() {
+    this.reset();
+    this.methods = {
+      '+': (a,b) => a + b,
+      '-': (a,b) => a - b,
+      '*': (a,b) => a * b,
+      '/': (a,b) => (b===0) ? NaN : a / b,
+    };
+    this.consoleLogData();
+  }
+  
+  //console log data
+  consoleLogData() {
+    console.log(`current input: ${this.currentInput} | current result: ${this.currentResult} | operators: ${this.operators} | operands: ${this.operands}`);
+  }
+
+  //returns result of operation
+  getResult(operator, operand1, operand2) {
+    if(!this.methods[operator] || isNaN(operand1) || isNaN(operand2)) {
+      return NaN;
+    } else {
+      return this.methods[operator](operand1, operand2);
+    }
+  }
+
+  inputHandlerNumber(number) {
+    if(this.currentInput === 0) {
+      this.currentInput = number;
+    } else {
+      this.currentInput += number;
+    }
+    this.consoleLogData();
+  }
+
+  inputHandlerDecimal() {
+    if(!this.currentInput.toString().includes('.')) {
+      this.currentInput += '.';
+      this.consoleLogData();
+    }
+  }
+
+  //TODO handle operator input
+  inputHandlerOperator(operator) {
+    //check operator is valid
+    if(this.methods[operator]) {
+      this.consoleLogData();
+    }
+  }
+
+  //all clear pressed
+  inputHandlerAllClear() {
+    this.reset();
+    this.consoleLogData();
+  }
+
+  //TODO handle equal sign input
+  inputHandlerEqualSign() {
+    this.consoleLogData();
+  }
+
+  //sets all variables to initial variables
+  reset() {
+    this.currentInput = 0;
+    this.currentResult = 0;
+    this.operators = [];
+    this.operands = [];
+  }
+}
+
+//EVENT LISTENERS
+//calculator
+const calculator = new Calculator();
+//past results
+const domResult = document.querySelector('#display-past-result');
+//user input
+const domInput = document.querySelector('#display-user-input');
+//operator buttons
+const domOperators = document.querySelectorAll('.mod-operator');
+for(let i = 0; i < domOperators.length; i++) {
+  const btn = domOperators[i];
+  btn.addEventListener('click', (e) => {calculator.inputHandlerOperator(e.target.value)});
+}
+//clear button
+const domAllClear = document.querySelector('#btn-all-clear');
+domAllClear.addEventListener('click', () => {calculator.inputHandlerAllClear();});
+//equals button
+const domEqualSign = document.querySelector('#btn-equals');
+domEqualSign.addEventListener('click', () => {calculator.inputHandlerEqualSign();});
+//decimal button
+const domDecimal = document.querySelector('#btn-decimal');
+domDecimal.addEventListener('click', () => {calculator.inputHandlerDecimal();});
+//number buttons
+const domNumbers = [];
+for(let i = 0; i <=9; i++) {
+  const btn = document.querySelector(`#btn-${i}`);
+  btn.addEventListener('click', () => {calculator.inputHandlerNumber(i);});
+  domNumbers.push(btn);
+}
+
+//TODO handle updating UI (input & results) using eventListeners for buttons (keyboard?)
+//TODO handle showing which operator is selected (toggle class when selected?)
+
+
 /*
 .header
 .calculator
@@ -20,67 +124,6 @@
   #btn-switch-sign      #btn-0                  #btn-decimal    #btn-equals
 ----------------------------------------------------------------------------------------------------------
 */
-
-class Calculator {
-  constructor() {
-    this.reset();
-    this.methods = {
-      '+': (a,b) => a + b,
-      '-': (a,b) => a - b,
-      '*': (a,b) => a * b,
-      '/': (a,b) => (b===0) ? NaN : a / b,
-    };
-  }
-  
-  //returns result of operation
-  getResult(operator, operand1, operand2) {
-    if(!this.methods[operator] || isNaN(operand1) || isNaN(operand2)) {
-      return NaN;
-    } else {
-      return this.methods[operator](operand1, operand2);
-    }
-  }
-
-  //sets all variables to initial variables
-  reset() {
-    this.currentInput = '0';
-    this.currentResult = '0';
-    this.operators = [];
-    this.operands = [];
-  }
-
-  //TODO handle number input
-  inputHandlerNumber(number) {
-
-  }
-
-  //TODO handle decimal input
-  inputHandlerDecimal() {
-
-  }
-
-  //TODO handle operator input
-  inputHandlerOperator(operator) {
-    //check oeprator is valid
-    if(this.methods[operator]) {
-
-    }
-  }
-
-  //all clear pressed
-  inputHandlerAllClear() {
-    this.reset();
-  }
-
-  //TODO handle equal sign input
-  inputHandlerEqualSign() {
-
-  }
-}
-
-//TODO handle updating UI (input & results) using eventListeners for buttons (keyboard?)
-
-
 
 // //inserts text into input div
 // function handleInsertion(e) {
