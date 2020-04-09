@@ -144,7 +144,12 @@ class Calculator {
     this.operators = [];
     this.operands = [];
     this.currentInputMode = this.inputModes.FIRST_OPERAND;
-    this.lastCalculation = {calculation:'0', operand: null, operator: null, lastMadeSolution: false};
+    this.lastCalculation = {
+      calculation:'0',
+      operand: null,
+      operator: null,
+      lastMadeSolution: false
+    };
     this.updateUI();
   }
 
@@ -192,6 +197,50 @@ for(let i = 0; i <=9; i++) {
   btn.addEventListener('click', () => {calculator.inputHandlerNumber(i);});
   domNumbers.push(btn);
 }
+//keyboard events
+document.addEventListener('keydown', (e) => {
+  if(e.shiftKey) {
+    //+
+    if(e.keyCode === 61) {
+      calculator.inputHandlerOperator('+');
+    //*
+    } else if(e.keyCode === 56) {
+      calculator.inputHandlerOperator('*');
+    } else {
+    }
+  } else {
+    //'[0-9]' -> top #s (48-57)
+    if(e.keyCode >= 48 && e.keyCode <= 57) {
+      calculator.inputHandlerNumber(e.keyCode - 48);
+    //'[0-9]' -> top #s (96-105)
+    } else if(e.keyCode >= 96 && e.keyCode <= 105) {
+      calculator.inputHandlerNumber(e.keyCode - 96);
+    //'+' -> numpad
+    } else if(e.keyCode === 107) {
+      calculator.inputHandlerOperator('+');
+    //'-' -> top #s || numpad
+    } else if(e.keyCode === 173 || e.keyCode === 109) {
+      calculator.inputHandlerOperator('-');
+    //'/' -> question mark || numpad
+    } else if(e.keyCode === 191 || e.keyCode === 111) {
+      calculator.inputHandlerOperator('/');
+    //'*' -> numpad
+    } else if(e.keyCode === 106) {
+      calculator.inputHandlerOperator('*');
+    //'.' -> > || numpad
+    } else if(e.keyCode === 190 || e.keyCode === 110) {
+      calculator.inputHandlerDecimal();
+    //'=' -> enter || numpad
+    } else if(e.keyCode === 13) {
+      calculator.inputHandlerEqualSign();
+    //'AC' -> esc
+    } else if(e.keyCode === 27) {
+      calculator.inputHandlerAllClear();
+    } else {
+    }
+  }
+  e.preventDefault();
+});
 
 //TODO handle showing which operator is selected (toggle class when selected?)
 

@@ -11,8 +11,8 @@ Simple calculator created with html, css, and js
 - [x] include UI
 - [x] rounding values to prevent overflow
 - [x] float point numbers
+- [X] allow keyboard input
 - [ ] stringing operations (e.g. 12 + 5 - 7) [see issues]
 - [ ] backspace button (i.e. undo)
 - [ ] handle large numbers using scientific notation
-- [ ] allow keyboard input
 - [ ] unit tests?
