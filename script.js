@@ -1,5 +1,5 @@
 class Calculator {
-  constructor() {
+  constructor(domInput, domResult) {
     this.reset();
     this.methods = {
       '+': (a,b) => a + b,
@@ -7,43 +7,91 @@ class Calculator {
       '*': (a,b) => a * b,
       '/': (a,b) => (b===0) ? NaN : a / b,
     };
+    this.domInput = domInput;
+    this.domResult = domResult;
+    this.MAX_INPUT_LENGTH = 10;
+    this.ERROR_MSG = 'Last result is not a number. Resetting calculator.';
     this.consoleLogData();
   }
   
+  inputModes = Object.freeze({FIRST_OPERAND:1, OPERATOR:2, SECOND_OPERATOR:3});
+
   //console log data
   consoleLogData() {
-    console.log(`current input: ${this.currentInput} | current result: ${this.currentResult} | operators: ${this.operators} | operands: ${this.operands}`);
+    console.log(`current input: ${this.currentInput} | ` +
+                `current input mode: ${this.currentInputMode} | ` +
+                `last calculation: ${this.lastCalculation.calculation} | ` +
+                `operands: ${this.operands} | ` + 
+                `operators: ${this.operators} | `);
+                
   }
 
   //returns result of operation
   getResult(operator, operand1, operand2) {
     if(!this.methods[operator] || isNaN(operand1) || isNaN(operand2)) {
+      console.log(`${operator} ${operand1} ${operand2}`);
       return NaN;
     } else {
+      console.log(`${operator} ${operand1} ${operand2}`);
       return this.methods[operator](operand1, operand2);
     }
   }
 
   inputHandlerNumber(number) {
-    if(this.currentInput === 0) {
-      this.currentInput = number;
-    } else {
-      this.currentInput += number;
+    if(this.currentInputMode === this.inputModes.OPERATOR) {
+      this.currentInputMode = this.inputModes.SECOND_OPERATOR;
+      this.currentInput = '';
     }
+    if(this.currentInput === '0' || this.lastCalculation.lastMadeSolution) {
+      this.currentInput = number.toString();
+      this.lastCalculation.lastMadeSolution = false;
+    } else {
+      if(this.currentInput.length < this.MAX_INPUT_LENGTH) {
+        this.currentInput += number.toString();
+      }
+    }
+    this.updateUI();
     this.consoleLogData();
   }
 
   inputHandlerDecimal() {
-    if(!this.currentInput.toString().includes('.')) {
-      this.currentInput += '.';
-      this.consoleLogData();
+    if(this.currentInputMode === this.inputModes.OPERATOR || this.lastCalculation.lastMadeSolution) {
+      this.currentInput = '0.';
+      this.currentInputMode = this.inputModes.SECOND_OPERATOR;
+      this.lastCalculation.lastMadeSolution = false;
+    } else {
+      if(!this.currentInput.includes('.')) {
+        if(this.currentInput.length < this.MAX_INPUT_LENGTH) {
+          this.currentInput += '.';
+        }
+      }
     }
+    this.updateUI();
+    this.consoleLogData();
   }
 
-  //TODO handle operator input
   inputHandlerOperator(operator) {
     //check operator is valid
     if(this.methods[operator]) {
+      //push current # and current operator
+      if(this.currentInputMode === this.inputModes.FIRST_OPERAND) {
+        this.currentInputMode = this.inputModes.OPERATOR;
+        this.operands.push(parseFloat(this.currentInput));
+        this.operators.push(operator);
+      //replace existing operator
+      } else if(this.currentInputMode === this.inputModes.OPERATOR) {
+        this.operators[this.operators.length - 1] = operator;
+      //handle equation and push operator
+      } else {
+        //result is a number
+        if(this.inputHandlerEqualSign()) {
+          this.operators.push(operator);
+        //NaN
+        } else {
+          this.reset(this.ERROR_MSG);
+        }
+      }
+      this.updateUI();
       this.consoleLogData();
     }
   }
@@ -52,29 +100,76 @@ class Calculator {
   inputHandlerAllClear() {
     this.reset();
     this.consoleLogData();
+    this.updateUI();
   }
 
-  //TODO handle equal sign input
+  //handles calculations: returns boolean based on result value (NaN->false)
   inputHandlerEqualSign() {
-    this.consoleLogData();
+    let result = NaN;
+    let operand2;
+    if(this.operands.length > 0 && this.operators.length > 0 && this.inputModes.SECOND_OPERATOR) {
+      const operand1 = this.roundToPlaces(parseFloat(this.operands[this.operands.length - 1]), this.MAX_INPUT_LENGTH); //last operand input
+      let operator = this.operators[this.operators.length - 1]; //last operator input
+      if(this.lastCalculation.lastMadeSolution) {
+        operand2 = this.roundToPlaces(parseFloat(this.lastCalculation.operand), this.MAX_INPUT_LENGTH); //second to last operand input
+        operator = this.lastCalculation.operator;
+      } else {
+        operand2 = this.roundToPlaces(parseFloat(this.currentInput), this.MAX_INPUT_LENGTH); //current input
+        this.operands.push(operand2);
+      }
+      result = this.roundToPlaces(this.getResult(operator, operand1, operand2),this.MAX_INPUT_LENGTH);
+      if(!isNaN(result)) {
+        this.lastCalculation.calculation = `${operand1} ${operator} ${operand2} =`;
+        this.lastCalculation.operand = operand2;
+        this.lastCalculation.operator = operator;
+        this.lastCalculation.lastMadeSolution = true;
+        this.operands.push(result);
+        this.currentInput = result.toString();
+        this.currentInputMode = this.inputModes.FIRST_OPERAND;
+        this.updateUI();
+        this.consoleLogData();
+      } else {
+        this.reset(this.ERROR_MSG);
+      }
+    }
+    return !isNaN(result);
   }
 
   //sets all variables to initial variables
-  reset() {
-    this.currentInput = 0;
-    this.currentResult = 0;
+  reset(optErrorMsg) {
+    if(optErrorMsg !== undefined) {
+      alert(optErrorMsg);
+    }
+    this.currentInput = '0';
     this.operators = [];
     this.operands = [];
+    this.currentInputMode = this.inputModes.FIRST_OPERAND;
+    this.lastCalculation = {calculation:'0', operand: null, operator: null, lastMadeSolution: false};
+    this.updateUI();
+  }
+
+  //taken from: https://www.jacklmoore.com/notes/rounding-in-javascript/
+  roundToPlaces(value, decimals) {
+    return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+  }
+
+  updateUI() {
+    if(this.domInput !== undefined) {
+      this.domInput.innerHTML = this.currentInput;
+    }
+    if(this.domResult !== undefined) {
+      this.domResult.innerHTML = this.lastCalculation.calculation; 
+    }
   }
 }
 
 //EVENT LISTENERS
-//calculator
-const calculator = new Calculator();
 //past results
 const domResult = document.querySelector('#display-past-result');
 //user input
 const domInput = document.querySelector('#display-user-input');
+//calculator
+const calculator = new Calculator(domInput, domResult);
 //operator buttons
 const domOperators = document.querySelectorAll('.mod-operator');
 for(let i = 0; i < domOperators.length; i++) {
@@ -98,7 +193,6 @@ for(let i = 0; i <=9; i++) {
   domNumbers.push(btn);
 }
 
-//TODO handle updating UI (input & results) using eventListeners for buttons (keyboard?)
 //TODO handle showing which operator is selected (toggle class when selected?)
 
 
